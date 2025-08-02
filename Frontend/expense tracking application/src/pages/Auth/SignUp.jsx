@@ -1,17 +1,13 @@
-
-// import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import AuthLayout from '../../components/layouts/AuthLayout';
 import MyInput from '../../components/Inputs/MyInput';
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
 import { validateEmail } from '../../utils/helper';
 import axiosInstance from '../../utils/axiosinstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import { UserContext } from '../../context/UserContext';
-// import React, { useState, useContext } from 'react';
 import uploadImage from '../../utils/uploadImage';
-import React, { useState, useContext } from 'react';
-// import upload from '../../../../../Backend/middleware/uploadMiddleware';
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -19,8 +15,6 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-
-  const { updateUser } = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -46,10 +40,9 @@ const SignUp = () => {
 
     // Signup API call
     try {
-
       // Upload image if present
       let profileImageUrl = "";
-      if(profilePic) {
+      if (profilePic) {
         const imgUploadRes = await uploadImage(profilePic);
         profileImageUrl = imgUploadRes.imageUrl || "";
       }
@@ -58,21 +51,18 @@ const SignUp = () => {
         fullName,
         email,
         password,
+        profileUrl: profileImageUrl,
       });
 
-      const { token, user } = response.data;
-
-      if(token) {
-        localStorage.setItem("token", token);
-        updateUser(user);
-        navigate("/dashboard");
+      if (response.status === 201) {
+        toast.success("Registration successful! Please log in.");
+        navigate("/login");
       }
-      // navigate('/login'); // After successful signup
     } catch (err) {
       if (err.response && err.response.data.message) {
         setError(err.response.data.message);
       } else {
-         setError("Signup failed. Try again.");
+        setError("Signup failed. Try again.");
       }
     }
   };
@@ -133,3 +123,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
